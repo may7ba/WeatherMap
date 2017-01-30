@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <style>
+       #map {
+        height: 400px;
+        width: 100%;
+       }
+    </style>
+	
+  </head>
+  <body>
+  
+    
+	<div class="row">
+	<div class="col-xs-9 col-md-7">
+	<div class = "panel panel-primary">
+	<div class = "panel-heading">
+	<h3>Weather Map</h3>
+	</div>
+	<div class = "panel-body">
+    <div id="map"></div>
+	</div>
+	</div>
+	</div>
+    <script>
+	// Map
+	
+	var oldMarker;
+
+	var marker;
+	var pos = {lat: 40.6583, lng: -111.9231};
+      function initMap() {
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 5,
+          center: pos
+        });
+         google.maps.event.addListener(map, 'click', function(event) {
+    placeMarker(map, event.latLng);
+	
+	//getWeather(event.latLng.lat(),event.latLng.lng());
+			
+	
+  });
+  
+
+      }
+	  function placeMarker(map,location) {
+
+            marker = new google.maps.Marker({
+                position: location,
+				draggable: true,
+                map: map,
+                animation: google.maps.Animation.DROP
+
+            });
+
+            if (oldMarker != undefined){
+			
+                oldMarker.setMap(null);
+				
+            }
+            oldMarker = marker;
+			
+
+        }
+		$(document).ready(function(){
+    $("#map").click(function(){
+        
+		//ajax
+		$.getJSON("http://api.openweathermap.org/data/2.5/weather?lat="+oldMarker.position.lat()+"&lon="+oldMarker.position.lng()+"&appid=4ac016809c01110390ba9db0fb03e491&units=metric", function(result){
+          
+			$('#div1').html('<p>Location : ' + result.name+ '</p>');
+			$('#div1').append('<p>Temperature : ' + result.main.temp+ ' Celsius </p>');
+			$('#div1').append('<p>Conditions : ' + result.weather[0].description+ ' </p>');
+			$('#div1').append('<p>Wind Speed : ' + result.wind.speed+ ' meter/sec</p>');
+			$('#div1').append('<p>Humidity : ' + result.main.humidity+ ' % </p>');
+				var rise = new Date(result.sys.sunrise*1000);
+				var hours = rise.getHours();
+                var minutes = "0" + rise.getMinutes();
+			$('#div1').append('<p>Sunrise : ' + hours + ':' + minutes.substr(-2) + '  </p>');
+			var set = new Date(result.sys.sunset*1000);
+				var hours = set.getHours();
+                var minutes = "0" + set.getMinutes();
+			$('#div1').append('<p>Sunset : ' + hours + ':' + minutes.substr(-2) + '  </p>');
+			$('#div1').append('<p>Wind Direction : ' + result.wind.speed+ ' degrees </p>');
+			
+        });
+		
+		//ajax end
+		
+    
+    });
+	
+});
+      
+ 
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjz2j2Yp85GORek1qTYqsmE4LJdXgZsGs&callback=initMap">
+    </script>
+	<div class="col-xs-3 col-md-5">
+<div class = "panel panel-primary">
+<div class = "panel-heading">
+<h2>Weather</h2>
+</div>
+<div class = "panel-body">
+<div class="well">
+<div id="div1"></div>
+</div>
+</div>
+</div>
+</div>
+  </body>
+</html>
